@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student-Teacher Application</title>
+<style>
+
+.toggle-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.toggle-button {
+  padding: 10px 20px;
+  background-color: #eee;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.content-section {
+  display: none;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.content-section.active {
+  display: block;
+}
+
+/* Styles for the registration/login forms */
+.form-container {
+  display: none; /* Initially hide all forms */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 20px; /* Add some space above the forms */
+}
+
+.form-container.active {
+  display: block;
+}
+
+label {
+  display: block; /* Make labels stack on top of inputs */
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-sizing: border-box; /* Include padding in width */
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Style for the "Switch to..." links */
+.switch-link {
+  margin-top: 10px;
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
+}
+
+#student-options, #teacher-options {
+    display: none; /* Initially hide the options */
+    margin-top: 10px; /* Add some space above the buttons */
+}
+#student-options button, #teacher-options button {
+    margin-right: 10px; /* Space between buttons */
+}
+
+.character-image-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.character-image {
+    width: 200px;
+    height: 200px;
+    margin-right: 20px;
+}
+
+/* Initially hide all character images */
+.character-image.student,
+.character-image.teacher {
+    display: none;
+}
+
+/* Show the correct image when the section is active */
+#student-section.active .character-image.student,
+#teacher-section.active .character-image.teacher {
+    display: block;
+}
+
+/* Hide all forms and welcome messages initially */
+.form-container,
+#student-welcome-message,
+#teacher-welcome-message {
+    display: none;
+}
+
+/* Show the correct form/message based on active section */
+#student-section.active #student-register-form,
+#student-section.active #student-login-form,
+#student-section.active #student-dashboard,  /* Show student dashboard */
+#student-section.active #student-welcome-message,
+#teacher-section.active #teacher-login-form,
+#teacher-section.active #teacher-dashboard,   /* Show teacher dashboard */
+#teacher-section.active #teacher-welcome-message {
+    display: block;
+}
+
+.content-section { /* Ensure content sections are visible */
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+/* Style for the dashboard content (image and other content) */
+.dashboard-content {
+    display: flex;
+    align-items: flex-start;
+}
+
+
+
+</style>
+</head>
+<body>
+
+<h1>Student-Teacher Dashboard</h1>
+
+
+<div class="toggle-bar">
+    <button class="toggle-button active" data-target="student-section">Student</button>
+    <button class="toggle-button" data-target="teacher-section">Teacher</button>
+  </div>
+
+
+  <div id="student-section" class="content-section active">
+    <div class="section-content"> 
+      <img src="student_placeholder.png" alt="Student" class="character-image student">
+      <h2>Student Section</h2>
+      <div>
+      <p id="student-welcome-message">Welcome, Student!</p>
+      <div id="student-register-form" class="form-container">
+      <h2>Student Registration</h2>
+      <form id="student-register-form-actual">
+        <label for="student-reg-username">Username:</label>
+        <input type="text" id="student-reg-username" name="student-reg-username">
+        <label for="student-reg-password">Password:</label>
+        <input type="password" id="student-reg-password" name="student-reg-password">
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  
+
+    <div id="student-login-form" class="form-container" style="display: none;">
+      <h2>Student Login</h2>
+      <form id="student-login-form-actual">
+        <label for="student-username">Username:</label>
+        <input type="text" id="student-username" name="student-username">
+        <label for="student-password">Password:</label>
+        <input type="password" id="student-password" name="student-password">
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  
+    <div id="student-dashboard" style="display: none;">
+      <p>Search Teacher:</p>
+      <input type="text" id="teacher-search">
+      <button onclick="searchTeacher()">Search</button>
+      <div id="teacher-search-results"></div>
+  
+      <p>Book Appointment:</p>
+      <select id="teacher-select"></select>
+      <input type="datetime-local" id="appointment-time">
+      <button onclick="bookAppointment()">Book</button>
+  
+      <p>Send Message:</p>
+      <select id="teacher-select-message"></select>
+      <textarea id="message-text"></textarea>
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+</div>
+  
+
+  <div id="teacher-section" class="content-section active">
+    <div class="section-content">
+    <img src="teacher_placeholder.png" alt="Teacher" class="character-image teacher">
+    <div>
+    <h2>Teacher Section</h2>
+      <p id="teacher-welcome-message">Welcome, Teacher!</p>
+      <div id="teacher-login-form" class="form-container">
+      <h2>Teacher Login</h2>
+      <form id="teacher-login-form-actual">
+        <label for="teacher-username">Username:</label>
+        <input type="text" id="teacher-username" name="teacher-username">
+        <label for="teacher-password">Password:</label>
+        <input type="password" id="teacher-password" name="teacher-password">
+        <button type="submit">Login</button>
+      </form>
+    </div>
+
+
+  
+    <div id="teacher-dashboard" style="display: none;">
+        <div id="schedule-appointment" >
+            <h3>Schedule Appointment</h3>
+            <input type="date" id="appointment-date">
+            <input type="time" id="appointment-time">
+            <button onclick="scheduleAppointmentSubmit()">Submit</button>
+            <div id="schedule-appointment-message"></div>
+        </div>
+
+        <div id="approve-cancel-appointment">
+            <h3>Approve/Cancel Appointment</h3>
+            <div id="appointment-requests">
+                </div>
+        </div>
+
+        <div id="view-messages">
+            <h3>View Messages</h3>
+            <div id="student-messages">
+                </div>
+        </div>
+
+        <div id="view-all-appointments">
+            <h3>View All Appointments</h3>
+            <div id="all-appointments">
+                </div>
+        </div>
+
+        <button onclick="showSection('schedule-appointment')">Schedule Appointment</button>
+        <button onclick="showSection('approve-cancel-appointment')">Approve/Cancel Appointment</button>
+        <button onclick="showSection('view-messages')">View Messages</button>
+        <button onclick="showSection('view-all-appointments')">View All Appointments</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+</div>
+</div>
+
+
+
+
+  <script>
+    // Toggle Bar Logic
+    const toggleButtons = document.querySelectorAll('.toggle-button');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        toggleButtons.forEach(btn => btn.classList.remove('active'));
+        contentSections.forEach(section => section.classList.remove('active'));
+        button.classList.add('active');
+        const targetSectionId = button.dataset.target;
+        const targetSection = document.getElementById(targetSectionId);
+        targetSection.classList.add('active');
+    
+        // Hide all forms and welcome messages in the target section
+        const forms = targetSection.querySelectorAll('.form-container');
+        forms.forEach(form => form.style.display = 'none');
+        const welcomeMessages = targetSection.querySelectorAll('[id$="-welcome-message"]');
+        welcomeMessages.forEach(message => message.style.display = 'none');
+        const dashboards = document.querySelectorAll('[id$="-dashboard"]');
+        dashboards.forEach(dashboard => dashboard.style.display = 'none');
+
+
+        if (button.dataset.target === 'student-section') {
+          document.getElementById('student-register-form').style.display = 'block';
+        } else if (button.dataset.target === 'teacher-section') {
+          document.getElementById('teacher-login-form').style.display = 'block';
+        }
+      });
+    });
+
+
+
+
+// Student Registration Handling
+document.getElementById('student-register-form-actual').addEventListener('submit', function(event) {
+  event.preventDefault();
+  // ... (Your Firebase registration logic here)
+  // After successful registration:
+  document.getElementById('student-register-form').style.display = 'none';
+  document.getElementById('student-login-form').style.display = 'block';
+});
+
+
+// Student Login Handling (No database)
+document.getElementById('student-login-form-actual').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const username = document.getElementById('student-username').value;
+  document.getElementById('student-login-form').style.display = 'none';
+  document.getElementById('student-welcome-message').textContent = "Welcome, " + username + "! This is your dashboard.";
+  document.getElementById('student-welcome-message').style.display = 'block';
+  document.getElementById('student-dashboard').style.display = 'block';
+});
+
+
+// Placeholder functions (No database)
+function searchTeacher() {
+  const searchTerm = document.getElementById('teacher-search').value;
+  const resultsDiv = document.getElementById('teacher-search-results');
+  resultsDiv.textContent = "Searching for: " + searchTerm + " ";
+}
+
+function bookAppointment() {
+  const teacher = document.getElementById('teacher-select').value;
+  const time = document.getElementById('appointment-time').value;
+  alert("Appointment booked with " + teacher + " at " + time + " ");
+}
+
+function sendMessage() {
+  const teacher = document.getElementById('teacher-select-message').value;
+  const message = document.getElementById('message-text').value;
+  alert("Message sent to " + teacher + ": " + message + " ");
+}
+
+
+// Teacher Login Handling
+document.getElementById('teacher-login-form-actual').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const username = document.getElementById('teacher-username').value;
+        const password = document.getElementById('teacher-password').value;
+
+        // Replace with your actual authentication logic (Firebase or other)
+        // ... (Authentication logic)
+
+        // After successful login:
+        document.getElementById('teacher-login-form').style.display = 'none';
+        document.getElementById('teacher-welcome-message').textContent = "Welcome, " + username + "! This is your dashboard.";
+        document.getElementById('teacher-welcome-message').style.display = 'block';
+        document.getElementById('teacher-dashboard').style.display = 'block';
+    });
+
+    function showSection(sectionId) {
+        // Hide all section divs
+        document.getElementById('schedule-appointment').style.display = 'none';
+        document.getElementById('approve-cancel-appointment').style.display = 'none';
+        document.getElementById('view-messages').style.display = 'none';
+        document.getElementById('view-all-appointments').style.display = 'none';
+
+        // Show the selected section
+        document.getElementById(sectionId).style.display = 'block';
+    }
+    function scheduleAppointmentSubmit() {
+        const date = document.getElementById('appointment-date').value;
+        const time = document.getElementById('appointment-time').value;
+        // ... (Logic to store the scheduled appointment - database/backend)
+        document.getElementById('schedule-appointment-message').textContent = "Appointment scheduled for " + date + " at " + time + " ";
+    }
+    
+
+    
+
+
+    // Placeholder functions for Approve/Cancel, View Messages, View All Appointments
+    // These are SIMULATED - NO DATABASE interaction
+
+    let appointmentRequests = []; // Array to store simulated appointment requests
+    let messages = []; // Array to store simulated messages
+    let appointments = []; // Array to store simulated appointments
+
+    function approveAppointment(appointmentId) {
+        const appointment = appointmentRequests.find(req => req.id === appointmentId);
+        if (appointment) {
+            appointment.status = "approved"; // Simulate approval
+            displayAppointmentRequests();
+            appointments.push(appointment); // Add to approved appointments (simulated)
+            displayAllAppointments();
+        }
+    }
+
+    function cancelAppointment(appointmentId) {
+        const appointment = appointmentRequests.find(req => req.id === appointmentId);
+        if (appointment) {
+            appointment.status = "cancelled"; // Simulate cancellation
+            displayAppointmentRequests();
+        }
+    }
+
+    function displayAppointmentRequests() {
+        const appointmentRequestsDiv = document.getElementById('appointment-requests');
+        appointmentRequestsDiv.innerHTML = ""; // Clear previous requests
+
+        appointmentRequests.forEach(req => {
+            const requestDiv = document.createElement('div');
+            requestDiv.innerHTML = `<p>${req.student} - ${req.date} ${req.time} (${req.status || 'pending'})</p>
+                <button onclick='approveAppointment(${req.id})' ${req.status !== 'pending' ? 'disabled' : ''}>Approve</button>
+                <button onclick='cancelAppointment(${req.id})' ${req.status !== 'pending' ? 'disabled' : ''}>Cancel</button>`;
+            appointmentRequestsDiv.appendChild(requestDiv);
+        });
+    }
+
+    function displayMessages() {
+        const messagesDiv = document.getElementById('student-messages');
+        messagesDiv.innerHTML = "";
+
+        messages.forEach(msg => {
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `<p>${msg.student}: ${msg.message}</p>`;
+            messagesDiv.appendChild(messageDiv);
+        });
+    }
+
+    function displayAllAppointments() {
+        const allAppointmentsDiv = document.getElementById('all-appointments');
+        allAppointmentsDiv.innerHTML = "";
+
+        appointments.forEach(appt => {
+            const apptDiv = document.createElement('div');
+            apptDiv.innerHTML = `<p>${appt.student} - ${appt.date} ${appt.time} (${appt.status})</p>`;
+            allAppointmentsDiv.appendChild(apptDiv);
+        });
+    }
+
+
+    // Example: Add dummy appointment requests and messages (replace with actual data)
+    appointmentRequests = [
+        { id: 1, student: "Student A", date: "2024-01-15", time: "10:00", status: "pending" },
+        { id: 2, student: "Student B", date: "2024-01-16", time: "14:00", status: "pending" }
+    ];
+
+    messages = [
+        { student: "Student A", message: "Hello Teacher!" },
+        { student: "Student B", message: "I have a question." }
+    ];
+
+
+    displayAppointmentRequests();
+    displayMessages();
+    displayAllAppointments();
+
+    
+    
+    function logout() {
+        // ... (Your logout logic)
+        alert("Logout clicked "); // Or redirect - replace with your logic
+        document.getElementById('teacher-dashboard').style.display = 'none'; // Hide Dashboard
+        document.getElementById('teacher-login-form').style.display = 'block'; // Show Login form again
+        document.getElementById('teacher-welcome-message').style.display = 'none'; // Hide welcome message
+
+    }
+    
+
+    // ... (Other placeholder functions remain the same)
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
